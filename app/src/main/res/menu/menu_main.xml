@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_blur_add_view"
+        android:icon="@drawable/ic_add_view"
+        android:orderInCategory="0"
+        android:title="添加控件"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_blur_show_dialog"
+        android:icon="@drawable/ic_show_dialog"
+        android:orderInCategory="0"
+        android:title="弹窗"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_blur_select_photo"
+        android:icon="@drawable/ic_select_photo"
+        android:orderInCategory="0"
+        android:title="选择图片"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_blur_select_effect"
+        android:icon="@drawable/ic_select_effect"
+        android:orderInCategory="0"
+        android:title="选择处理器"
+        app:showAsAction="always" />
+</menu>

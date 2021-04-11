@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/ivOriginal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?colorSurface"
+        android:scaleType="centerCrop"
+        tools:src="@tools:sample/backgrounds/scenic" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="8dp"
+        android:padding="3dp"
+        android:background="@drawable/shape_on_surface_bg"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/llRadius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvRadius"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="模糊半径"
+                android:textColor="?colorSurface"
+                tools:ignore="HardcodedText" />
+
+            <SeekBar
+                android:id="@+id/sbRadius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:max="100"
+                tools:progress="10" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llBoxSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvBoxSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="块尺寸"
+                android:textColor="?colorSurface"
+                tools:ignore="HardcodedText" />
+
+            <SeekBar
+                android:id="@+id/sbBoxSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:max="100"
+                tools:progress="20" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llWatermarkSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvWatermarkSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="水印大小"
+                android:textColor="?colorSurface"
+                tools:ignore="HardcodedText" />
+
+            <SeekBar
+                android:id="@+id/sbWatermarkSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:max="100"
+                tools:progress="20" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvSimpleSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="缩小比例"
+                android:textColor="?colorSurface"
+                tools:ignore="HardcodedText" />
+
+            <SeekBar
+                android:id="@+id/sbSimpleSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:max="20"
+                tools:progress="8" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
