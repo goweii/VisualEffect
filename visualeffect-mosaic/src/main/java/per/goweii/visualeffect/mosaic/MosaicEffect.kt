@@ -36,9 +36,9 @@ class MosaicEffect(var boxSize: Int) : BaseVisualEffect() {
         val rowCount = ceil(w.toFloat() / boxSize).toInt()
         val columnCount = ceil(h.toFloat() / boxSize).toInt()
         for (r in 0 until rowCount) {
+            val startX = r * boxSize + 1
             for (c in 0 until columnCount) {
-                val startX = c * boxSize + 1
-                val startY = r * boxSize + 1
+                val startY = c * boxSize + 1
                 dimBlock(pix, startX, startY, boxSize, w, h)
             }
         }

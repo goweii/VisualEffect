@@ -10,7 +10,7 @@ fun Context.getActivity(): Activity? {
     }
     if (this is ContextWrapper) {
         val ctx = this.baseContext
-        if (ctx != this) {
+        if (ctx !== this) {
             return ctx.getActivity()
         }
     }
