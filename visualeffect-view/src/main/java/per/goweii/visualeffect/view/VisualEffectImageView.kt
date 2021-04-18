@@ -18,8 +18,6 @@ class VisualEffectImageView : AppCompatImageView {
 
     private var renderStartTime = 0L
     private var renderEndTime = 0L
-    private val isRendering: Boolean
-        get() = renderEndTime < renderStartTime
 
     var visualEffect: VisualEffect? = null
         set(value) {
@@ -142,6 +140,4 @@ class VisualEffectImageView : AppCompatImageView {
             }
         )
     }
-
-    private object StopException : RuntimeException()
 }
