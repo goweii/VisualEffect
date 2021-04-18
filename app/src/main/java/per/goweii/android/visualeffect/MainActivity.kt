@@ -20,7 +20,7 @@ import per.goweii.visualeffect.blur.RSBlurEffect
 import per.goweii.visualeffect.core.GroupVisualEffect
 import per.goweii.visualeffect.core.VisualEffect
 import per.goweii.visualeffect.mosaic.MosaicEffect
-import per.goweii.visualeffect.view.VisualEffectView
+import per.goweii.visualeffect.view.BackdropVisualEffectView
 import per.goweii.visualeffect.watermask.WatermarkEffect
 import kotlin.math.max
 
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     private val watermarkTextSize: Float get() = binding.sbWatermarkSize.progress.toFloat()
     private val simpleSize: Float get() = max(binding.sbSimpleSize.progress.toFloat(), 1F)
 
-    private lateinit var visualEffectView: VisualEffectView
+    private lateinit var backdropVisualEffectView: BackdropVisualEffectView
 
     private var currVisualEffectIndex = 0
 
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        visualEffectView = newVisualEffectCard(false)
+        backdropVisualEffectView = newVisualEffectCard(false)
         binding.sbRadius.apply {
             max = 100
             progress = 10
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                         currVisualEffectIndex
                     ) { dialog, which ->
                         currVisualEffectIndex = which
-                        visualEffectView.visualEffect =
+                        backdropVisualEffectView.visualEffect =
                             visualEffectArray[currVisualEffectIndex].second.invoke()
                         refreshEffectValue()
                         dialog.dismiss()
@@ -207,14 +207,14 @@ class MainActivity : AppCompatActivity() {
     private fun refreshSimpleSize() {
         binding.tvSimpleSize.text =
             "缩小比例(${binding.sbSimpleSize.progress}/${binding.sbSimpleSize.max})"
-        visualEffectView.simpleSize = simpleSize
+        backdropVisualEffectView.simpleSize = simpleSize
     }
 
     private fun refreshEffectValue() {
         binding.llRadius.isVisible = false
         binding.llBoxSize.isVisible = false
         binding.llWatermarkSize.isVisible = false
-        visualEffectView.visualEffect.run {
+        backdropVisualEffectView.visualEffect.run {
             when (this) {
                 is GroupVisualEffect -> {
                     this.getVisualEffects().forEach {
@@ -257,15 +257,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun newVisualEffectView(): VisualEffectView {
-        val visualEffectView = VisualEffectView(this)
+    private fun newVisualEffectView(): BackdropVisualEffectView {
+        val visualEffectView = BackdropVisualEffectView(this)
         visualEffectView.visualEffect = visualEffectArray[currVisualEffectIndex].second.invoke()
         visualEffectView.simpleSize = simpleSize
         return visualEffectView
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun newVisualEffectCard(closeable: Boolean): VisualEffectView {
+    private fun newVisualEffectCard(closeable: Boolean): BackdropVisualEffectView {
         val cardView = CardView(this).apply {
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = TypedValue.applyDimension(

@@ -1,34 +1,21 @@
 package per.goweii.visualeffect.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.Bitmap
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
-import android.view.View
-import android.view.ViewTreeObserver
+import androidx.appcompat.widget.AppCompatImageView
 import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class VisualEffectView : View {
+class VisualEffectImageView : AppCompatImageView {
     private val bitmapCanvas = Canvas()
     private var cacheBitmap: Bitmap? = null
-    private var activityDecorView: View? = null
-    private var isDifferentRoot = false
 
     private val srcRect = Rect()
     private val dstRect = Rect()
 
-    private val locations = IntArray(2)
-    private val onPreDrawListener = ViewTreeObserver.OnPreDrawListener {
-        renderOnce()
-        true
-    }
     private var renderStartTime = 0L
     private var renderEndTime = 0L
     private val isRendering: Boolean
@@ -75,47 +62,31 @@ class VisualEffectView : View {
         defStyleAttr
     )
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        context.getActivity()?.let {
-            activityDecorView = it.window?.decorView
-        }
-        activityDecorView?.let {
-            if (it.viewTreeObserver.isAlive) {
-                it.viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
-            }
-            isDifferentRoot = it.rootView !== rootView
-            if (isDifferentRoot) {
-                it.postInvalidate()
-            }
-        } ?: kotlin.run {
-            isDifferentRoot = false
-        }
-    }
-
     override fun onDetachedFromWindow() {
-        activityDecorView?.let {
-            if (it.viewTreeObserver.isAlive) {
-                it.viewTreeObserver.removeOnPreDrawListener(onPreDrawListener)
-            }
-        }
         visualEffect?.recycle()
         super.onDetachedFromWindow()
     }
 
-    override fun draw(canvas: Canvas) {
-        if (isRendering) {
-            throw StopException
-        } else {
-            super.draw(canvas)
-        }
-    }
-
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        cacheBitmap?.let {
-            onDrawEffectedBitmap(canvas, it)
-        }
+        val visualEffect = visualEffect
+            ?: kotlin.run {
+                super.onDraw(canvas)
+                return
+            }
+        prepare()
+        val cacheBitmap = cacheBitmap ?: return
+        renderStartTime = System.nanoTime()
+        val restoreCount = bitmapCanvas.save()
+        bitmapCanvas.drawColor(Color.TRANSPARENT)
+        bitmapCanvas.scale(
+            cacheBitmap.width.toFloat() / this.width.toFloat(),
+            cacheBitmap.height.toFloat() / this.height.toFloat()
+        )
+        super.onDraw(bitmapCanvas)
+        bitmapCanvas.restoreToCount(restoreCount)
+        visualEffect.process(cacheBitmap, cacheBitmap)
+        renderEndTime = System.nanoTime()
+        onDrawEffectedBitmap(canvas, cacheBitmap)
         if (isShowDebugInfo) {
             onDrawDebugInfo(canvas)
         }
@@ -131,44 +102,6 @@ class VisualEffectView : View {
                 null
             }
             bitmapCanvas.setBitmap(cacheBitmap)
-        }
-    }
-
-    private fun renderOnce() {
-        val visualEffect = visualEffect ?: return
-        if (!isShown) return
-        val decor = activityDecorView ?: return
-        if (!decor.isDirty) return
-        prepare()
-        val bitmap = cacheBitmap ?: return
-        val canvas = bitmapCanvas
-        renderStartTime = System.nanoTime()
-        drawBackdropToBitmap(decor, canvas, bitmap)
-        visualEffect.process(bitmap, bitmap)
-        renderEndTime = System.nanoTime()
-        invalidate()
-    }
-
-    private fun drawBackdropToBitmap(view: View, canvas: Canvas, bitmap: Bitmap) {
-        val restoreCount = canvas.save()
-        try {
-            canvas.drawColor(Color.WHITE)
-            view.getLocationOnScreen(locations)
-            var x = -locations[0]
-            var y = -locations[1]
-            this.getLocationOnScreen(locations)
-            x += locations[0]
-            y += locations[1]
-            canvas.scale(
-                bitmap.width.toFloat() / this.width.toFloat(),
-                bitmap.height.toFloat() / this.height.toFloat()
-            )
-            canvas.translate(-x.toFloat(), -y.toFloat())
-            view.background?.draw(canvas)
-            view.draw(canvas)
-        } catch (e: StopException) {
-        } finally {
-            canvas.restoreToCount(restoreCount)
         }
     }
 
