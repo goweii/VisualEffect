@@ -5,15 +5,24 @@ import android.graphics.Bitmap
 import android.renderscript.*
 import android.util.Log
 
-class RSBlurEffect(context: Context, radius: Float) : BlurEffect(radius) {
+class RSBlurEffect : BlurEffect {
     private val tag = this::class.java.simpleName
-    private val applicationContext = context.applicationContext
+    private val applicationContext: Context
 
     private var renderScript: RenderScript? = null
     private var scriptIntrinsicBlur: ScriptIntrinsicBlur? = null
     private var allocationIn: Allocation? = null
     private var allocationOut: Allocation? = null
     private var bitmapArgb8888: Bitmap? = null
+
+    constructor(context: Context) : super() {
+        applicationContext = context.applicationContext
+    }
+
+    constructor(context: Context, radius: Float = 8F) : super(radius) {
+        applicationContext = context.applicationContext
+    }
+
 
     override fun recycle() {
         super.recycle()

@@ -1,18 +1,23 @@
 package per.goweii.visualeffect.view
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.TypedValue
 import android.view.View
+import androidx.customview.view.AbsSavedState
 import per.goweii.visualeffect.core.VisualEffect
+import java.lang.Exception
 import java.text.NumberFormat
 import kotlin.math.max
 
-class VisualEffectHelper(private val view: View) {
+class ChildrenVisualEffectHelper(private val view: View) {
     private var cacheBitmap: Bitmap? = null
     private val bitmapCanvas = Canvas()
     private val paint = Paint().apply {
@@ -65,6 +70,8 @@ class VisualEffectHelper(private val view: View) {
     }
 
     var onCallSuperDraw: ((canvas: Canvas) -> Unit)? = null
+    var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
+    var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
 
     init {
         view.addOnAttachStateChangeListener(onAttachStateChangeListener)
@@ -92,6 +99,31 @@ class VisualEffectHelper(private val view: View) {
         if (isShowDebugInfo) {
             onDrawDebugInfo(canvas)
         }
+    }
+
+    fun onRestoreInstanceState(state: Parcelable?) {
+        if (state !is SavedState) {
+            onCallSuperRestoreInstanceState?.invoke(state)
+            return
+        }
+        onCallSuperRestoreInstanceState?.invoke(state.superState)
+        isShowDebugInfo = state.isShowDebugInfo
+        simpleSize = state.simpleSize
+        state.visualEffectClassName?.let { className ->
+            createVisualEffectByClassName(className)?.let {
+                visualEffect = it
+            }
+        }
+    }
+
+    fun onSaveInstanceState(): Parcelable {
+        val superState = onCallSuperSaveInstanceState?.invoke() ?: View.BaseSavedState.EMPTY_STATE
+        return SavedState(
+            superState = superState,
+            isShowDebugInfo = isShowDebugInfo,
+            simpleSize = simpleSize,
+            visualEffectClassName = visualEffect?.javaClass?.name
+        )
     }
 
     private fun prepare() {
@@ -143,5 +175,56 @@ class VisualEffectHelper(private val view: View) {
                 color = Color.BLACK
             }
         )
+    }
+
+    private fun createVisualEffectByClassName(className: String?): VisualEffect? {
+        className ?: return null
+        var cls: Class<*>? = null
+        try {
+            cls = Class.forName(className)
+        } catch (e: Exception) {
+        }
+        cls ?: return null
+        try {
+            val c = cls.getConstructor()
+            return c.newInstance() as VisualEffect
+        } catch (e: Exception) {
+        }
+        try {
+            val c = cls.getConstructor(Context::class.java)
+            return c.newInstance() as VisualEffect
+        } catch (e: Exception) {
+        }
+        return null
+    }
+
+    private class SavedState : AbsSavedState {
+        val isShowDebugInfo: Boolean
+        val simpleSize: Float
+        val visualEffectClassName: String?
+
+        constructor(
+            superState: Parcelable,
+            isShowDebugInfo: Boolean,
+            simpleSize: Float,
+            visualEffectClassName: String?
+        ) : super(superState) {
+            this.isShowDebugInfo = isShowDebugInfo
+            this.simpleSize = simpleSize
+            this.visualEffectClassName = visualEffectClassName
+        }
+
+        constructor(source: Parcel, loader: ClassLoader?) : super(source, loader) {
+            this.isShowDebugInfo = source.readInt() == 1
+            this.simpleSize = source.readFloat()
+            this.visualEffectClassName = source.readString()
+        }
+
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            super.writeToParcel(dest, flags)
+            dest.writeInt(if (isShowDebugInfo) 1 else 0)
+            dest.writeFloat(simpleSize)
+            dest.writeString(visualEffectClassName)
+        }
     }
 }

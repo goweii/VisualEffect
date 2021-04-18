@@ -5,7 +5,7 @@ import per.goweii.visualeffect.core.BaseVisualEffect
 import kotlin.math.ceil
 import kotlin.math.max
 
-class MosaicEffect(var boxSize: Int) : BaseVisualEffect() {
+class MosaicEffect(var boxSize: Int = 24) : BaseVisualEffect() {
     private var pixels: IntArray? = null
 
     override fun recycle() {

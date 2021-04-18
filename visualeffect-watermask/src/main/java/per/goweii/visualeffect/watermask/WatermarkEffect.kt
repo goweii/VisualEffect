@@ -1,12 +1,13 @@
 package per.goweii.visualeffect.watermask
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import per.goweii.visualeffect.core.BaseVisualEffect
 
 class WatermarkEffect(
-    var text: String,
-    var textColor: Int,
-    var textSize: Float
+    var text: String = "",
+    var textColor: Int = Color.BLACK,
+    var textSize: Float = 24F
 ) : BaseVisualEffect() {
     override fun doEffect(input: Bitmap, output: Bitmap) {
         useCanvas(output, true) { canvas, paint ->
