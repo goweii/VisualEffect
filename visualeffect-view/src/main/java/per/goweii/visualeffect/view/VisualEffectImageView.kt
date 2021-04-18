@@ -1,7 +1,12 @@
 package per.goweii.visualeffect.view
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatImageView
@@ -34,7 +39,7 @@ class VisualEffectImageView : AppCompatImageView {
                 postInvalidate()
             }
         }
-    var isShowDebugInfo = true
+    var isShowDebugInfo = BuildConfig.DEBUG
         set(value) {
             if (field != value) {
                 field = value

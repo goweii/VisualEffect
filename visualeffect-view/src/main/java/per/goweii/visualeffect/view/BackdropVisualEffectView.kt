@@ -49,7 +49,7 @@ class BackdropVisualEffectView : View {
                 postInvalidate()
             }
         }
-    var isShowDebugInfo = true
+    var isShowDebugInfo = BuildConfig.DEBUG
         set(value) {
             if (field != value) {
                 field = value
