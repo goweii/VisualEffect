@@ -5,16 +5,15 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class FastBlurEffect : BlurEffect {
+class FastBlurEffect @JvmOverloads constructor(
+    radius: Float = 8F
+) : BlurEffect(radius) {
     private var pixels: IntArray? = null
     private var reds: IntArray? = null
     private var greens: IntArray? = null
     private var blues: IntArray? = null
     private var vmins: IntArray? = null
     private var divs: IntArray? = null
-
-    constructor() : super()
-    constructor(radius: Float) : super(radius)
 
     override fun recycle() {
         super.recycle()

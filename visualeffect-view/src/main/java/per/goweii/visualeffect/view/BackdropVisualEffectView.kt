@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.annotation.ColorInt
 import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
@@ -34,6 +35,14 @@ class BackdropVisualEffectView : View {
     private val isRendering: Boolean
         get() = renderEndTime < renderStartTime
 
+    @ColorInt
+    var overlayColor: Int = Color.TRANSPARENT
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidate()
+            }
+        }
     var visualEffect: VisualEffect? = null
         set(value) {
             if (field != value) {
@@ -58,7 +67,6 @@ class BackdropVisualEffectView : View {
         }
     private val paint = Paint().apply {
         isAntiAlias = true
-        color = Color.TRANSPARENT
         typeface = Typeface.MONOSPACE
         textSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
@@ -173,11 +181,13 @@ class BackdropVisualEffectView : View {
     }
 
     private fun onDrawEffectedBitmap(canvas: Canvas, bitmap: Bitmap) {
+        paint.color = Color.WHITE
         srcRect.right = bitmap.width
         srcRect.bottom = bitmap.height
         dstRect.right = width
         dstRect.bottom = height
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
+        canvas.drawColor(overlayColor)
     }
 
     private fun onDrawDebugInfo(canvas: Canvas) {
