@@ -22,7 +22,6 @@ class ChildrenVisualEffectHelper(private val view: View) {
     private val bitmapCanvas = Canvas()
     private val paint = Paint().apply {
         isAntiAlias = true
-        color = Color.TRANSPARENT
         typeface = Typeface.MONOSPACE
         textSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
@@ -140,6 +139,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
     }
 
     private fun onDrawEffectedBitmap(canvas: Canvas, bitmap: Bitmap) {
+        paint.color = Color.WHITE
         srcRect.right = bitmap.width
         srcRect.bottom = bitmap.height
         dstRect.right = view.width
