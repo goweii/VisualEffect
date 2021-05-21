@@ -5,7 +5,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
@@ -29,17 +32,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val visualEffectArray = arrayOf<Pair<String, () -> VisualEffect>>(
-        GroupVisualEffect::class.java.simpleName to {
-            GroupVisualEffect(
-                RSBlurEffect(applicationContext, blurRadius),
-                MosaicEffect(mosaicBoxSize),
-                WatermarkEffect(
-                    "goweii",
-                    Color.BLACK,
-                    watermarkTextSize
-                ),
-            )
-        },
         RSBlurEffect::class.java.simpleName to {
             RSBlurEffect(applicationContext, blurRadius)
         },
@@ -51,6 +43,17 @@ class MainActivity : AppCompatActivity() {
         },
         WatermarkEffect::class.java.simpleName to {
             WatermarkEffect("goweii", Color.BLACK, watermarkTextSize)
+        },
+        GroupVisualEffect::class.java.simpleName to {
+            GroupVisualEffect(
+                RSBlurEffect(applicationContext, blurRadius),
+                MosaicEffect(mosaicBoxSize),
+                WatermarkEffect(
+                    "goweii",
+                    Color.BLACK,
+                    watermarkTextSize
+                ),
+            )
         }
     )
 
@@ -267,6 +270,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     private fun newVisualEffectCard(closeable: Boolean): BackdropVisualEffectView {
         val cardView = CardView(this).apply {
+            isSelected = false
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
@@ -303,8 +307,18 @@ class MainActivity : AppCompatActivity() {
             it.gravity = Gravity.CENTER
         })
         DragGestureHelper.attach(cardView).apply {
-            if (closeable) {
-                onDoubleClick = { decorView.removeView(cardView) }
+            onDoubleClick = {
+                if (closeable) {
+                    decorView.removeView(cardView)
+                } else {
+                    cardView.isSelected = !cardView.isSelected
+                    val s = if (cardView.isSelected) 2F else 1F
+                    cardView.animate()
+                        .scaleX(s)
+                        .scaleY(s)
+                        .setDuration(2000)
+                        .start()
+                }
             }
         }
         return visualEffectView

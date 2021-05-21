@@ -1,15 +1,11 @@
 package per.goweii.visualeffect.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.Bitmap
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
 import per.goweii.visualeffect.core.VisualEffect
@@ -74,6 +70,28 @@ class BackdropVisualEffectView : View {
             context.resources.displayMetrics
         )
     }
+
+    private val realScaleX: Float
+        get() {
+            var realScaleX = scaleX
+            var viewGroup: ViewGroup? = parent as? ViewGroup?
+            while (viewGroup != null) {
+                realScaleX *= viewGroup.scaleX
+                viewGroup = viewGroup.parent as? ViewGroup?
+            }
+            return realScaleX
+        }
+
+    private val realScaleY: Float
+        get() {
+            var realScaleY = scaleY
+            var viewGroup: ViewGroup? = parent as? ViewGroup?
+            while (viewGroup != null) {
+                realScaleY *= viewGroup.scaleY
+                viewGroup = viewGroup.parent as? ViewGroup?
+            }
+            return realScaleY
+        }
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -166,9 +184,11 @@ class BackdropVisualEffectView : View {
             this.getLocationInWindow(locations)
             x += locations[0]
             y += locations[1]
+            val vw = this.width.toFloat() * realScaleX
+            val vh = this.height.toFloat() * realScaleY
             canvas.scale(
-                bitmap.width.toFloat() / this.width.toFloat(),
-                bitmap.height.toFloat() / this.height.toFloat()
+                bitmap.width.toFloat() / vw,
+                bitmap.height.toFloat() / vh
             )
             canvas.translate(-x.toFloat(), -y.toFloat())
             decor.background?.draw(canvas)

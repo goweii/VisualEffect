@@ -25,6 +25,7 @@ class DragGestureHelper private constructor(
     init {
         view.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
+            true
         }
     }
 
