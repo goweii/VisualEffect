@@ -157,14 +157,13 @@ class BackdropVisualEffectView : View {
         invalidate()
     }
 
-    private fun captureToBitmap(view: View, canvas: Canvas, bitmap: Bitmap) {
+    private fun captureToBitmap(decor: View, canvas: Canvas, bitmap: Bitmap) {
         val restoreCount = canvas.save()
         try {
-            canvas.drawColor(Color.WHITE)
-            view.getLocationOnScreen(locations)
+            decor.getLocationInWindow(locations)
             var x = -locations[0]
             var y = -locations[1]
-            this.getLocationOnScreen(locations)
+            this.getLocationInWindow(locations)
             x += locations[0]
             y += locations[1]
             canvas.scale(
@@ -172,8 +171,8 @@ class BackdropVisualEffectView : View {
                 bitmap.height.toFloat() / this.height.toFloat()
             )
             canvas.translate(-x.toFloat(), -y.toFloat())
-            view.background?.draw(canvas)
-            view.draw(canvas)
+            decor.background?.draw(canvas)
+            decor.draw(canvas)
         } catch (e: StopException) {
         } finally {
             canvas.restoreToCount(restoreCount)
