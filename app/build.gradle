@@ -1,20 +1,12 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
+    id "com.android.application"
+    id "kotlin-android"
 }
+apply from: "../lib-build.gradle"
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
     defaultConfig {
         applicationId "per.goweii.android.visualeffect"
-        minSdkVersion 14
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
@@ -24,35 +16,28 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
     }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation "androidx.core:core-ktx:$androidx_core_version"
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
+    implementation "com.google.android.material:material:1.2.1"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
 
-    implementation project(':visualeffect-core')
-    implementation project(':visualeffect-view')
-    implementation project(':visualeffect-blur')
-    implementation project(':visualeffect-mosaic')
-    implementation project(':visualeffect-watermask')
+    implementation project(":visualeffect-core")
+    implementation project(":visualeffect-view")
+    implementation project(":visualeffect-blur")
+    implementation project(":visualeffect-mosaic")
+    implementation project(":visualeffect-watermask")
 
-    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
-    implementation('com.github.bumptech.glide:okhttp3-integration:4.8.0') {
+    implementation "com.github.chrisbanes:PhotoView:2.0.0"
+    implementation "com.github.bumptech.glide:glide:4.8.0"
+    annotationProcessor "com.github.bumptech.glide:compiler:4.8.0"
+    implementation("com.github.bumptech.glide:okhttp3-integration:4.8.0") {
         exclude group: "com.android.support"
     }
 }
