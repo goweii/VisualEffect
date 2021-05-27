@@ -32,6 +32,4 @@ android {
 
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compileOnly "androidx.core:core-ktx:$androidx_core_version"
-    compileOnly "androidx.appcompat:appcompat:$androidx_appcompat_version"
 }

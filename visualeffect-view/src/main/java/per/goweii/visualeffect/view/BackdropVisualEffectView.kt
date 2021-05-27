@@ -7,7 +7,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.annotation.ColorInt
 import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
@@ -31,7 +30,6 @@ class BackdropVisualEffectView : View {
     private val isRendering: Boolean
         get() = renderEndTime < renderStartTime
 
-    @ColorInt
     var overlayColor: Int = Color.TRANSPARENT
         set(value) {
             if (field != value) {

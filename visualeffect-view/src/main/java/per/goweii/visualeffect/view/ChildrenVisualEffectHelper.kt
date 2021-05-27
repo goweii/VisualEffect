@@ -11,7 +11,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.TypedValue
 import android.view.View
-import androidx.customview.view.AbsSavedState
 import per.goweii.visualeffect.core.VisualEffect
 import java.lang.Exception
 import java.text.NumberFormat
@@ -198,7 +197,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
         return null
     }
 
-    private class SavedState : AbsSavedState {
+    private class SavedState : View.BaseSavedState {
         val isShowDebugInfo: Boolean
         val simpleSize: Float
         val visualEffectClassName: String?

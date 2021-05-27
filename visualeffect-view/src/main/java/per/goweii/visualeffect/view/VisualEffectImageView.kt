@@ -9,12 +9,12 @@ import android.graphics.Bitmap
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.util.TypedValue
-import androidx.appcompat.widget.AppCompatImageView
+import android.widget.ImageView
 import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class VisualEffectImageView : AppCompatImageView {
+class VisualEffectImageView : ImageView {
     private val bitmapCanvas = Canvas()
     private var cacheBitmap: Bitmap? = null
 
