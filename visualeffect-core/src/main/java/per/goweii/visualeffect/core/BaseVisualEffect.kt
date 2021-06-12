@@ -5,7 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PaintFlagsDrawFilter
 
-abstract class BaseVisualEffect : VisualEffect {
+abstract class BaseVisualEffect : ParcelableVisualEffect() {
     private val canvas = Canvas()
     private val paint = Paint()
     private val antiAliasDrawFilter =

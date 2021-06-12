@@ -18,7 +18,6 @@ class RSBlurEffect @JvmOverloads constructor(
     private var allocationOut: Allocation? = null
     private var bitmapArgb8888: Bitmap? = null
 
-
     override fun recycle() {
         super.recycle()
         destroyAllocations()

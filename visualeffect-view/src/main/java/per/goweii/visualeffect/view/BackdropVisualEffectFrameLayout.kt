@@ -2,20 +2,15 @@ package per.goweii.visualeffect.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.widget.FrameLayout
 import per.goweii.visualeffect.core.VisualEffect
-import java.text.NumberFormat
-import kotlin.math.max
 
-class BackdropVisualEffectView @JvmOverloads constructor(
+class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
     private val visualEffectHelper = BackdropVisualEffectHelper(this)
         .apply {
             onCallSuperDraw = { super.draw(it) }
@@ -43,6 +38,10 @@ class BackdropVisualEffectView @JvmOverloads constructor(
         set(value) {
             visualEffectHelper.isShowDebugInfo = value
         }
+
+    init {
+        setWillNotDraw(false)
+    }
 
     @SuppressLint("MissingSuperCall")
     override fun draw(canvas: Canvas) {

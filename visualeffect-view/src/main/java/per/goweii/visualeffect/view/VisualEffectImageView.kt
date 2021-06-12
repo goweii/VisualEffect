@@ -14,7 +14,9 @@ import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class VisualEffectImageView : ImageView {
+class VisualEffectImageView @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : ImageView(context, attrs, defStyleAttr) {
     private val bitmapCanvas = Canvas()
     private var cacheBitmap: Bitmap? = null
 
@@ -55,14 +57,6 @@ class VisualEffectImageView : ImageView {
             context.resources.displayMetrics
         )
     }
-
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     override fun onDetachedFromWindow() {
         visualEffect?.recycle()

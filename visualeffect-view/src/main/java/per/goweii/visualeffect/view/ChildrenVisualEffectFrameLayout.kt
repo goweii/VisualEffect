@@ -8,7 +8,9 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import per.goweii.visualeffect.core.VisualEffect
 
-class ChildrenVisualEffectFrameLayout : FrameLayout {
+class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
     private val visualEffectHelper = ChildrenVisualEffectHelper(this)
         .apply {
             onCallSuperDraw = { super.draw(it) }
@@ -31,14 +33,6 @@ class ChildrenVisualEffectFrameLayout : FrameLayout {
         set(value) {
             visualEffectHelper.isShowDebugInfo = value
         }
-
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    )
 
     @SuppressLint("MissingSuperCall")
     override fun draw(canvas: Canvas) {

@@ -1,12 +1,23 @@
 package per.goweii.visualeffect.mosaic
 
 import android.graphics.Bitmap
+import android.os.Parcel
 import per.goweii.visualeffect.core.BaseVisualEffect
 import kotlin.math.ceil
 import kotlin.math.max
 
 class MosaicEffect(var boxSize: Int = 24) : BaseVisualEffect() {
     private var pixels: IntArray? = null
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        super.writeToParcel(parcel, flags)
+        parcel.writeInt(boxSize)
+    }
+
+    override fun readFromParcel(parcel: Parcel) {
+        super.readFromParcel(parcel)
+        boxSize = parcel.readInt()
+    }
 
     override fun recycle() {
         super.recycle()

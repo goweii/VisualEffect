@@ -5,30 +5,38 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import per.goweii.visualeffect.core.ParcelableVisualEffect
 import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class ChildrenVisualEffectHelper(private val view: View) {
-    private var cacheBitmap: Bitmap? = null
+class BackdropVisualEffectHelper(private val view: View) {
     private val bitmapCanvas = Canvas()
-    private val paint = Paint().apply {
-        isAntiAlias = true
-        typeface = Typeface.MONOSPACE
-        textSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            9F,
-            view.context.resources.displayMetrics
-        )
-    }
+    private var cacheBitmap: Bitmap? = null
+    private var activityDecorView: View? = null
+    private var isDifferentRoot = false
 
     private val srcRect = Rect()
     private val dstRect = Rect()
 
+    private val locations = IntArray(2)
+    private val onPreDrawListener = ViewTreeObserver.OnPreDrawListener {
+        renderOnce()
+        true
+    }
     private var renderStartTime = 0L
     private var renderEndTime = 0L
+    private val isRendering: Boolean get() = renderEndTime < renderStartTime
 
+    var overlayColor: Int = Color.TRANSPARENT
+        set(value) {
+            if (field != value) {
+                field = value
+                view.postInvalidate()
+            }
+        }
     var visualEffect: VisualEffect? = null
         set(value) {
             if (field != value) {
@@ -52,42 +60,66 @@ class ChildrenVisualEffectHelper(private val view: View) {
             }
         }
 
-    private val onAttachStateChangeListener = object : View.OnAttachStateChangeListener {
-        override fun onViewAttachedToWindow(v: View?) {
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        typeface = Typeface.MONOSPACE
+        textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            9F,
+            view.context.resources.displayMetrics
+        )
+    }
+
+    private val realScaleX: Float
+        get() {
+            var realScaleX = view.scaleX
+            var viewGroup: ViewGroup? = view.parent as? ViewGroup?
+            while (viewGroup != null) {
+                realScaleX *= viewGroup.scaleX
+                viewGroup = viewGroup.parent as? ViewGroup?
+            }
+            return realScaleX
         }
 
-        override fun onViewDetachedFromWindow(v: View?) {
-            visualEffect?.recycle()
+    private val realScaleY: Float
+        get() {
+            var realScaleY = view.scaleY
+            var viewGroup: ViewGroup? = view.parent as? ViewGroup?
+            while (viewGroup != null) {
+                realScaleY *= viewGroup.scaleY
+                viewGroup = viewGroup.parent as? ViewGroup?
+            }
+            return realScaleY
         }
-    }
 
     var onCallSuperDraw: ((canvas: Canvas) -> Unit)? = null
     var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
     var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
 
     init {
-        view.addOnAttachStateChangeListener(onAttachStateChangeListener)
+        view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {
+                onAttachedToWindow()
+            }
+
+            override fun onViewDetachedFromWindow(v: View) {
+                onDetachedFromWindow()
+            }
+        })
     }
 
     fun draw(canvas: Canvas) {
-        val visualEffect = visualEffect ?: kotlin.run {
+        if (isRendering) {
+            throw StopException
+        } else {
             onCallSuperDraw?.invoke(canvas)
-            return
         }
-        prepare()
-        val cacheBitmap = cacheBitmap ?: return
-        renderStartTime = System.nanoTime()
-        val restoreCount = bitmapCanvas.save()
-        bitmapCanvas.drawColor(Color.TRANSPARENT)
-        bitmapCanvas.scale(
-            cacheBitmap.width.toFloat() / view.width.toFloat(),
-            cacheBitmap.height.toFloat() / view.height.toFloat()
-        )
-        onCallSuperDraw?.invoke(bitmapCanvas)
-        bitmapCanvas.restoreToCount(restoreCount)
-        visualEffect.process(cacheBitmap, cacheBitmap)
-        renderEndTime = System.nanoTime()
-        onDrawEffectedBitmap(canvas, cacheBitmap)
+    }
+
+    fun onDraw(canvas: Canvas) {
+        cacheBitmap?.let {
+            onDrawEffectedBitmap(canvas, it)
+        }
         if (isShowDebugInfo) {
             onDrawDebugInfo(canvas)
         }
@@ -101,6 +133,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
         onCallSuperRestoreInstanceState?.invoke(state.superState)
         isShowDebugInfo = state.isShowDebugInfo
         simpleSize = state.simpleSize
+        overlayColor = state.overlayColor
         visualEffect = state.visualEffect
     }
 
@@ -110,8 +143,35 @@ class ChildrenVisualEffectHelper(private val view: View) {
             superState = superState,
             isShowDebugInfo = isShowDebugInfo,
             simpleSize = simpleSize,
+            overlayColor = overlayColor,
             visualEffect = visualEffect as? ParcelableVisualEffect?
         )
+    }
+
+    private fun onAttachedToWindow() {
+        view.context.getActivity()?.let {
+            activityDecorView = it.window?.decorView
+        }
+        activityDecorView?.let {
+            if (it.viewTreeObserver.isAlive) {
+                it.viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
+            }
+            isDifferentRoot = it.rootView !== view.rootView
+            if (isDifferentRoot) {
+                it.postInvalidate()
+            }
+        } ?: kotlin.run {
+            isDifferentRoot = false
+        }
+    }
+
+    private fun onDetachedFromWindow() {
+        activityDecorView?.let {
+            if (it.viewTreeObserver.isAlive) {
+                it.viewTreeObserver.removeOnPreDrawListener(onPreDrawListener)
+            }
+        }
+        visualEffect?.recycle()
     }
 
     private fun prepare() {
@@ -127,6 +187,45 @@ class ChildrenVisualEffectHelper(private val view: View) {
         }
     }
 
+    private fun renderOnce() {
+        val visualEffect = visualEffect ?: return
+        if (!view.isShown) return
+        val decor = activityDecorView ?: return
+        if (!decor.isDirty) return
+        prepare()
+        val bitmap = cacheBitmap ?: return
+        val canvas = bitmapCanvas
+        renderStartTime = System.nanoTime()
+        captureToBitmap(decor, canvas, bitmap)
+        visualEffect.process(bitmap, bitmap)
+        renderEndTime = System.nanoTime()
+        view.invalidate()
+    }
+
+    private fun captureToBitmap(decor: View, canvas: Canvas, bitmap: Bitmap) {
+        val restoreCount = canvas.save()
+        try {
+            decor.getLocationInWindow(locations)
+            var x = -locations[0]
+            var y = -locations[1]
+            view.getLocationInWindow(locations)
+            x += locations[0]
+            y += locations[1]
+            val vw = view.width.toFloat() * realScaleX
+            val vh = view.height.toFloat() * realScaleY
+            canvas.scale(
+                bitmap.width.toFloat() / vw,
+                bitmap.height.toFloat() / vh
+            )
+            canvas.translate(-x.toFloat(), -y.toFloat())
+            decor.background?.draw(canvas)
+            decor.draw(canvas)
+        } catch (e: StopException) {
+        } finally {
+            canvas.restoreToCount(restoreCount)
+        }
+    }
+
     private fun onDrawEffectedBitmap(canvas: Canvas, bitmap: Bitmap) {
         paint.color = Color.WHITE
         srcRect.right = bitmap.width
@@ -134,6 +233,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
         dstRect.right = view.width
         dstRect.bottom = view.height
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
+        canvas.drawColor(overlayColor)
     }
 
     private fun onDrawDebugInfo(canvas: Canvas) {
@@ -170,13 +270,17 @@ class ChildrenVisualEffectHelper(private val view: View) {
         superState: Parcelable,
         val isShowDebugInfo: Boolean,
         val simpleSize: Float,
+        val overlayColor: Int,
         val visualEffect: ParcelableVisualEffect?
     ) : View.BaseSavedState(superState) {
         override fun writeToParcel(dest: Parcel, flags: Int) {
             super.writeToParcel(dest, flags)
             dest.writeInt(if (isShowDebugInfo) 1 else 0)
             dest.writeFloat(simpleSize)
+            dest.writeInt(overlayColor)
             dest.writeParcelable(visualEffect, 0)
         }
     }
+
+    private object StopException : RuntimeException()
 }
