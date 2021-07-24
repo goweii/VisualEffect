@@ -14,7 +14,7 @@ import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class VisualEffectImageView @JvmOverloads constructor(
+open class VisualEffectImageView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ImageView(context, attrs, defStyleAttr) {
     private val bitmapCanvas = Canvas()

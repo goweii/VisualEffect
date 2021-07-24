@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import per.goweii.visualeffect.core.VisualEffect
 
-class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
+open class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
     private val visualEffectHelper = BackdropVisualEffectHelper(this)

@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import per.goweii.visualeffect.core.VisualEffect
 
-class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
+open class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
     private val visualEffectHelper = ChildrenVisualEffectHelper(this)

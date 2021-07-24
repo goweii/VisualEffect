@@ -13,7 +13,7 @@ import per.goweii.visualeffect.core.VisualEffect
 import java.text.NumberFormat
 import kotlin.math.max
 
-class BackdropVisualEffectView @JvmOverloads constructor(
+open class BackdropVisualEffectView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
     private val visualEffectHelper = BackdropVisualEffectHelper(this)
