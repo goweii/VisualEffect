@@ -11,12 +11,12 @@ import per.goweii.visualeffect.core.VisualEffect
 open class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
-    private val visualEffectHelper = BackdropVisualEffectHelper(this)
-        .apply {
-            onCallSuperDraw = { super.draw(it) }
+    private val visualEffectHelper: BackdropVisualEffectHelper by lazy {
+        BackdropVisualEffectHelper(this).apply {
             onCallSuperRestoreInstanceState = { super.onRestoreInstanceState(it) }
             onCallSuperSaveInstanceState = { super.onSaveInstanceState() }
         }
+    }
 
     var overlayColor: Int
         get() = visualEffectHelper.overlayColor
@@ -40,12 +40,7 @@ open class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
         }
 
     init {
-        setWillNotDraw(false)
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun draw(canvas: Canvas) {
-        visualEffectHelper.draw(canvas)
+        super.setWillNotDraw(false)
     }
 
     override fun onDraw(canvas: Canvas) {

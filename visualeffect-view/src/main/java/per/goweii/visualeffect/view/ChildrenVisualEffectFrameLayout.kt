@@ -11,12 +11,13 @@ import per.goweii.visualeffect.core.VisualEffect
 open class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
-    private val visualEffectHelper = ChildrenVisualEffectHelper(this)
-        .apply {
+    private val visualEffectHelper by lazy {
+        ChildrenVisualEffectHelper(this).apply {
             onCallSuperDraw = { super.draw(it) }
             onCallSuperRestoreInstanceState = { super.onRestoreInstanceState(it) }
             onCallSuperSaveInstanceState = { super.onSaveInstanceState() }
         }
+    }
 
     var visualEffect: VisualEffect?
         get() = visualEffectHelper.visualEffect

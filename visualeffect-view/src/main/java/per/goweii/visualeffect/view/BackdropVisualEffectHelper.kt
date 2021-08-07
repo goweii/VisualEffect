@@ -92,7 +92,6 @@ class BackdropVisualEffectHelper(private val view: View) {
             return realScaleY
         }
 
-    var onCallSuperDraw: ((canvas: Canvas) -> Unit)? = null
     var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
     var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
 
@@ -108,20 +107,16 @@ class BackdropVisualEffectHelper(private val view: View) {
         })
     }
 
-    fun draw(canvas: Canvas) {
+    fun onDraw(canvas: Canvas) {
         if (isRendering) {
             throw StopException
         } else {
-            onCallSuperDraw?.invoke(canvas)
-        }
-    }
-
-    fun onDraw(canvas: Canvas) {
-        cacheBitmap?.let {
-            onDrawEffectedBitmap(canvas, it)
-        }
-        if (isShowDebugInfo) {
-            onDrawDebugInfo(canvas)
+            cacheBitmap?.let {
+                onDrawEffectedBitmap(canvas, it)
+            }
+            if (isShowDebugInfo) {
+                onDrawDebugInfo(canvas)
+            }
         }
     }
 
