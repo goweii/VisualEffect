@@ -28,7 +28,8 @@ class BackdropVisualEffectHelper(private val view: View) {
     }
     private var renderStartTime = 0L
     private var renderEndTime = 0L
-    private val isRendering: Boolean get() = renderEndTime < renderStartTime
+
+    val isRendering: Boolean get() = renderEndTime < renderStartTime
 
     var overlayColor: Int = Color.TRANSPARENT
         set(value) {
@@ -60,6 +61,9 @@ class BackdropVisualEffectHelper(private val view: View) {
             }
         }
 
+    var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
+    var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
+
     private val paint = Paint().apply {
         isAntiAlias = true
         typeface = Typeface.MONOSPACE
@@ -70,30 +74,18 @@ class BackdropVisualEffectHelper(private val view: View) {
         )
     }
 
-    private val realScaleX: Float
+    private val realScaleXY: FloatArray = floatArrayOf(1F, 1F)
         get() {
-            var realScaleX = view.scaleX
+            field[0] = view.scaleX
+            field[0] = view.scaleY
             var viewGroup: ViewGroup? = view.parent as? ViewGroup?
             while (viewGroup != null) {
-                realScaleX *= viewGroup.scaleX
+                field[0] *= viewGroup.scaleX
+                field[0] *= viewGroup.scaleY
                 viewGroup = viewGroup.parent as? ViewGroup?
             }
-            return realScaleX
+            return field
         }
-
-    private val realScaleY: Float
-        get() {
-            var realScaleY = view.scaleY
-            var viewGroup: ViewGroup? = view.parent as? ViewGroup?
-            while (viewGroup != null) {
-                realScaleY *= viewGroup.scaleY
-                viewGroup = viewGroup.parent as? ViewGroup?
-            }
-            return realScaleY
-        }
-
-    var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
-    var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
 
     init {
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -206,8 +198,9 @@ class BackdropVisualEffectHelper(private val view: View) {
             view.getLocationInWindow(locations)
             x += locations[0]
             y += locations[1]
-            val vw = view.width.toFloat() * realScaleX
-            val vh = view.height.toFloat() * realScaleY
+            val realScaleXX = realScaleXY
+            val vw = view.width.toFloat() * realScaleXX[0]
+            val vh = view.height.toFloat() * realScaleXX[1]
             canvas.scale(
                 bitmap.width.toFloat() / vw,
                 bitmap.height.toFloat() / vh

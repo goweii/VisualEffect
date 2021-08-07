@@ -51,6 +51,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
                 view.postInvalidate()
             }
         }
+    val isRendering: Boolean get() = renderEndTime < renderStartTime
 
     private val onAttachStateChangeListener = object : View.OnAttachStateChangeListener {
         override fun onViewAttachedToWindow(v: View?) {

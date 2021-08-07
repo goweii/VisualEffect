@@ -1,7 +1,7 @@
 apply plugin: 'maven'
 
 group "per.goweii.visualeffect"
-version "1.0.6"
+version "1.0.7"
 
 uploadArchives {
     repositories {

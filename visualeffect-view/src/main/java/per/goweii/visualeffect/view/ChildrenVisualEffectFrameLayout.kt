@@ -34,6 +34,7 @@ open class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
         set(value) {
             visualEffectHelper.isShowDebugInfo = value
         }
+    val isRendering get() = visualEffectHelper.isRendering
 
     @SuppressLint("MissingSuperCall")
     override fun draw(canvas: Canvas) {

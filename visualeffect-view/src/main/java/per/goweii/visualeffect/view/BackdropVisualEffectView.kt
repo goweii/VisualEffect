@@ -38,6 +38,7 @@ open class BackdropVisualEffectView @JvmOverloads constructor(
         set(value) {
             visualEffectHelper.isShowDebugInfo = value
         }
+    val isRendering get() = visualEffectHelper.isRendering
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)

@@ -1,12 +1,7 @@
 package per.goweii.visualeffect.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.Bitmap
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.widget.ImageView
@@ -48,6 +43,8 @@ open class VisualEffectImageView @JvmOverloads constructor(
                 postInvalidate()
             }
         }
+    val isRendering: Boolean get() = renderEndTime < renderStartTime
+
     private val paint = Paint().apply {
         isAntiAlias = true
         typeface = Typeface.MONOSPACE

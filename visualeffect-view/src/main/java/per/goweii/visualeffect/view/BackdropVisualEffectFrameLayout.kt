@@ -38,6 +38,7 @@ open class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
         set(value) {
             visualEffectHelper.isShowDebugInfo = value
         }
+    val isRendering get() = visualEffectHelper.isRendering
 
     init {
         super.setWillNotDraw(false)
