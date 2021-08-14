@@ -192,10 +192,10 @@ class BackdropVisualEffectHelper(private val view: View) {
     private fun captureToBitmap(decor: View, canvas: Canvas, bitmap: Bitmap) {
         val restoreCount = canvas.save()
         try {
-            decor.getLocationInWindow(locations)
+            decor.getLocationOnScreen(locations)
             var x = -locations[0]
             var y = -locations[1]
-            view.getLocationInWindow(locations)
+            view.getLocationOnScreen(locations)
             x += locations[0]
             y += locations[1]
             val realScaleXX = realScaleXY
