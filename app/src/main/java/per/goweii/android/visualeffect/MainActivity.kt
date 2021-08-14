@@ -17,9 +17,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import per.goweii.android.visualeffect.databinding.ActivityMainBinding
-import per.goweii.visualeffect.blur.BlurEffect
-import per.goweii.visualeffect.blur.FastBlurEffect
-import per.goweii.visualeffect.blur.RSBlurEffect
+import per.goweii.visualeffect.blur.*
 import per.goweii.visualeffect.core.GroupVisualEffect
 import per.goweii.visualeffect.core.VisualEffect
 import per.goweii.visualeffect.mosaic.MosaicEffect
@@ -34,6 +32,12 @@ class MainActivity : AppCompatActivity() {
     private val visualEffectArray = arrayOf<Pair<String, () -> VisualEffect>>(
         RSBlurEffect::class.java.simpleName to {
             RSBlurEffect(applicationContext, blurRadius)
+        },
+        StackBlurEffect::class.java.simpleName to {
+            StackBlurEffect(applicationContext, blurRadius)
+        },
+        BoxBlurEffect::class.java.simpleName to {
+            BoxBlurEffect(applicationContext, blurRadius)
         },
         FastBlurEffect::class.java.simpleName to {
             FastBlurEffect(blurRadius)
