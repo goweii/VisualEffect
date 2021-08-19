@@ -4,13 +4,6 @@ plugins {
 }
 apply from: "../lib-build.gradle"
 
-android {
-    defaultConfig {
-        renderscriptTargetApi renderscript_target_api
-        renderscriptSupportModeEnabled renderscript_support_mode_enabled
-    }
-}
-
 dependencies {
     compileOnly project(":visualeffect-core")
 }
