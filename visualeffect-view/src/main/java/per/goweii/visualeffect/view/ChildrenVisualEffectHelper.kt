@@ -62,17 +62,13 @@ class ChildrenVisualEffectHelper(private val view: View) {
         }
     }
 
-    var onCallSuperDraw: ((canvas: Canvas) -> Unit)? = null
-    var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
-    var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
-
     init {
         view.addOnAttachStateChangeListener(onAttachStateChangeListener)
     }
 
-    fun draw(canvas: Canvas) {
+    fun draw(canvas: Canvas, callSuper: (Canvas) -> Unit) {
         val visualEffect = visualEffect ?: kotlin.run {
-            onCallSuperDraw?.invoke(canvas)
+            callSuper.invoke(canvas)
             return
         }
         prepare()
@@ -84,7 +80,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
             cacheBitmap.width.toFloat() / view.width.toFloat(),
             cacheBitmap.height.toFloat() / view.height.toFloat()
         )
-        onCallSuperDraw?.invoke(bitmapCanvas)
+        callSuper.invoke(bitmapCanvas)
         bitmapCanvas.restoreToCount(restoreCount)
         visualEffect.process(cacheBitmap, cacheBitmap)
         renderEndTime = System.nanoTime()
@@ -94,19 +90,19 @@ class ChildrenVisualEffectHelper(private val view: View) {
         }
     }
 
-    fun onRestoreInstanceState(state: Parcelable?) {
+    fun onRestoreInstanceState(state: Parcelable?, callSuper: (Parcelable?) -> Unit) {
         if (state !is SavedState) {
-            onCallSuperRestoreInstanceState?.invoke(state)
+            callSuper.invoke(state)
             return
         }
-        onCallSuperRestoreInstanceState?.invoke(state.superState)
+        callSuper.invoke(state.superState)
         isShowDebugInfo = state.isShowDebugInfo
         simpleSize = state.simpleSize
         visualEffect = state.visualEffect
     }
 
-    fun onSaveInstanceState(): Parcelable {
-        val superState = onCallSuperSaveInstanceState?.invoke() ?: View.BaseSavedState.EMPTY_STATE
+    fun onSaveInstanceState(callSuper: () -> Parcelable?): Parcelable {
+        val superState = callSuper.invoke() ?: View.BaseSavedState.EMPTY_STATE
         return SavedState(
             superState = superState,
             isShowDebugInfo = isShowDebugInfo,
@@ -122,6 +118,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
             cacheBitmap = try {
                 Bitmap.createBitmap(simpledWidth, simpledHeight, Bitmap.Config.ARGB_8888)
             } catch (e: OutOfMemoryError) {
+                Runtime.getRuntime().gc()
                 null
             }
             bitmapCanvas.setBitmap(cacheBitmap)

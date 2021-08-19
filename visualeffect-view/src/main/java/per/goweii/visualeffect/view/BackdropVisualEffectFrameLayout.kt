@@ -1,61 +1,100 @@
 package per.goweii.visualeffect.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import per.goweii.visualeffect.core.VisualEffect
+import kotlin.math.max
 
 open class BackdropVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
-    private val visualEffectHelper: BackdropVisualEffectHelper by lazy {
-        BackdropVisualEffectHelper(this).apply {
-            onCallSuperRestoreInstanceState = { super.onRestoreInstanceState(it) }
-            onCallSuperSaveInstanceState = { super.onSaveInstanceState() }
-        }
+    private val effectHelper: BackdropVisualEffectHelper by lazy {
+        BackdropVisualEffectHelper(this)
+    }
+    private val outlineHelper: OutlineHelper by lazy {
+        OutlineHelper(this)
     }
 
     var overlayColor: Int
-        get() = visualEffectHelper.overlayColor
+        get() = effectHelper.overlayColor
         set(value) {
-            visualEffectHelper.overlayColor = value
+            effectHelper.overlayColor = value
         }
     var visualEffect: VisualEffect?
-        get() = visualEffectHelper.visualEffect
+        get() = effectHelper.visualEffect
         set(value) {
-            visualEffectHelper.visualEffect = value
+            effectHelper.visualEffect = value
         }
     var simpleSize: Float
-        get() = visualEffectHelper.simpleSize
+        get() = effectHelper.simpleSize
         set(value) {
-            visualEffectHelper.simpleSize = value
+            effectHelper.simpleSize = value
         }
-    var isShowDebugInfo
-        get() = visualEffectHelper.isShowDebugInfo
+    var isShowDebugInfo: Boolean
+        get() = effectHelper.isShowDebugInfo
         set(value) {
-            visualEffectHelper.isShowDebugInfo = value
+            effectHelper.isShowDebugInfo = value
         }
-    val isRendering get() = visualEffectHelper.isRendering
+    var outlineBuilder: OutlineBuilder?
+        get() = outlineHelper.outlineBuilder
+        set(value) {
+            outlineHelper.outlineBuilder = value
+        }
+    val isRendering get() = effectHelper.isRendering
+
 
     init {
         super.setWillNotDraw(false)
     }
 
+    override fun getSuggestedMinimumWidth(): Int {
+        return max(
+            super.getSuggestedMinimumWidth(),
+            outlineHelper.suggestedMinimumWidth
+        )
+    }
+
+    override fun getSuggestedMinimumHeight(): Int {
+        return max(
+            super.getSuggestedMinimumHeight(),
+            outlineHelper.suggestedMinimumHeight
+        )
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        outlineHelper.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        outlineHelper.onSizeChanged(w, h, oldw, oldh)
+    }
+
+    override fun draw(canvas: Canvas) {
+        effectHelper.checkRendering()
+        outlineHelper.draw(canvas) {
+            super.draw(it)
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        visualEffectHelper.onDraw(canvas)
+        effectHelper.onDraw(canvas)
     }
 
-    @SuppressLint("MissingSuperCall")
     override fun onRestoreInstanceState(state: Parcelable?) {
-        visualEffectHelper.onRestoreInstanceState(state)
+        effectHelper.onRestoreInstanceState(state) {
+            super.onRestoreInstanceState(it)
+        }
     }
 
-    @SuppressLint("MissingSuperCall")
     override fun onSaveInstanceState(): Parcelable {
-        return visualEffectHelper.onSaveInstanceState()
+        return effectHelper.onSaveInstanceState {
+            super.onSaveInstanceState()
+        }
     }
 }

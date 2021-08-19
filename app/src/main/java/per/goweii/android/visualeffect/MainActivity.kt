@@ -3,12 +3,11 @@ package per.goweii.android.visualeffect
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Path
+import android.graphics.RectF
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +23,7 @@ import per.goweii.visualeffect.core.GroupVisualEffect
 import per.goweii.visualeffect.core.VisualEffect
 import per.goweii.visualeffect.mosaic.MosaicEffect
 import per.goweii.visualeffect.view.BackdropVisualEffectView
+import per.goweii.visualeffect.view.OutlineBuilder
 import per.goweii.visualeffect.watermask.WatermarkEffect
 import kotlin.math.max
 
@@ -274,7 +274,7 @@ class MainActivity : AppCompatActivity() {
             setCardBackgroundColor(Color.TRANSPARENT)
             cardElevation = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
-                10F,
+                99999F,
                 resources.displayMetrics
             )
             radius = TypedValue.applyDimension(
@@ -284,6 +284,21 @@ class MainActivity : AppCompatActivity() {
             )
         }
         val visualEffectView = newVisualEffectView()
+        visualEffectView.outlineBuilder = object : OutlineBuilder() {
+            override fun buildOutline(view: View, outline: Path) {
+                outline.addRoundRect(
+                    RectF(
+                        0F,
+                        0F,
+                        view.width.toFloat(),
+                        view.height.toFloat()
+                    ),
+                    view.width.toFloat() / 2F,
+                    view.height.toFloat() / 2F,
+                    Path.Direction.CW
+                )
+            }
+        }
         cardView.addView(
             visualEffectView,
             ViewGroup.LayoutParams(

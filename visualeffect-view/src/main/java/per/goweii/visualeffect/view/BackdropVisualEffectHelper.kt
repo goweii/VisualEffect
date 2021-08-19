@@ -26,6 +26,30 @@ class BackdropVisualEffectHelper(private val view: View) {
         renderOnce()
         true
     }
+
+    private val paint = Paint().apply {
+        isAntiAlias = true
+        typeface = Typeface.MONOSPACE
+        textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            9F,
+            view.context.resources.displayMetrics
+        )
+    }
+
+    private val realScaleXY: FloatArray = floatArrayOf(1F, 1F)
+        get() {
+            field[0] = view.scaleX
+            field[1] = view.scaleY
+            var viewGroup: ViewGroup? = view.parent as? ViewGroup?
+            while (viewGroup != null) {
+                field[0] *= viewGroup.scaleX
+                field[1] *= viewGroup.scaleY
+                viewGroup = viewGroup.parent as? ViewGroup?
+            }
+            return field
+        }
+
     private var renderStartTime = 0L
     private var renderEndTime = 0L
 
@@ -61,32 +85,6 @@ class BackdropVisualEffectHelper(private val view: View) {
             }
         }
 
-    var onCallSuperRestoreInstanceState: ((state: Parcelable?) -> Unit)? = null
-    var onCallSuperSaveInstanceState: (() -> Parcelable?)? = null
-
-    private val paint = Paint().apply {
-        isAntiAlias = true
-        typeface = Typeface.MONOSPACE
-        textSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            9F,
-            view.context.resources.displayMetrics
-        )
-    }
-
-    private val realScaleXY: FloatArray = floatArrayOf(1F, 1F)
-        get() {
-            field[0] = view.scaleX
-            field[0] = view.scaleY
-            var viewGroup: ViewGroup? = view.parent as? ViewGroup?
-            while (viewGroup != null) {
-                field[0] *= viewGroup.scaleX
-                field[0] *= viewGroup.scaleY
-                viewGroup = viewGroup.parent as? ViewGroup?
-            }
-            return field
-        }
-
     init {
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {
@@ -99,33 +97,36 @@ class BackdropVisualEffectHelper(private val view: View) {
         })
     }
 
-    fun onDraw(canvas: Canvas) {
+    fun checkRendering() {
         if (isRendering) {
             throw StopException
-        } else {
-            cacheBitmap?.let {
-                onDrawEffectedBitmap(canvas, it)
-            }
-            if (isShowDebugInfo) {
-                onDrawDebugInfo(canvas)
-            }
         }
     }
 
-    fun onRestoreInstanceState(state: Parcelable?) {
+    fun onDraw(canvas: Canvas) {
+        checkRendering()
+        cacheBitmap?.let {
+            onDrawEffectedBitmap(canvas, it)
+        }
+        if (isShowDebugInfo) {
+            onDrawDebugInfo(canvas)
+        }
+    }
+
+    fun onRestoreInstanceState(state: Parcelable?, callSuper: (Parcelable?) -> Unit) {
         if (state !is SavedState) {
-            onCallSuperRestoreInstanceState?.invoke(state)
+            callSuper.invoke(state)
             return
         }
-        onCallSuperRestoreInstanceState?.invoke(state.superState)
+        callSuper.invoke(state.superState)
         isShowDebugInfo = state.isShowDebugInfo
         simpleSize = state.simpleSize
         overlayColor = state.overlayColor
         visualEffect = state.visualEffect
     }
 
-    fun onSaveInstanceState(): Parcelable {
-        val superState = onCallSuperSaveInstanceState?.invoke() ?: View.BaseSavedState.EMPTY_STATE
+    fun onSaveInstanceState(callSuper: () -> Parcelable?): Parcelable {
+        val superState = callSuper.invoke() ?: View.BaseSavedState.EMPTY_STATE
         return SavedState(
             superState = superState,
             isShowDebugInfo = isShowDebugInfo,
@@ -168,6 +169,7 @@ class BackdropVisualEffectHelper(private val view: View) {
             cacheBitmap = try {
                 Bitmap.createBitmap(simpledWidth, simpledHeight, Bitmap.Config.ARGB_8888)
             } catch (e: OutOfMemoryError) {
+                Runtime.getRuntime().gc()
                 null
             }
             bitmapCanvas.setBitmap(cacheBitmap)
@@ -183,6 +185,7 @@ class BackdropVisualEffectHelper(private val view: View) {
         val bitmap = cacheBitmap ?: return
         val canvas = bitmapCanvas
         renderStartTime = System.nanoTime()
+        bitmap.eraseColor(Color.TRANSPARENT)
         captureToBitmap(decor, canvas, bitmap)
         visualEffect.process(bitmap, bitmap)
         renderEndTime = System.nanoTime()

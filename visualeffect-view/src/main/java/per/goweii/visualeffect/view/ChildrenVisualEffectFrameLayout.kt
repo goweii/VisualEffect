@@ -12,11 +12,7 @@ open class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
     private val visualEffectHelper by lazy {
-        ChildrenVisualEffectHelper(this).apply {
-            onCallSuperDraw = { super.draw(it) }
-            onCallSuperRestoreInstanceState = { super.onRestoreInstanceState(it) }
-            onCallSuperSaveInstanceState = { super.onSaveInstanceState() }
-        }
+        ChildrenVisualEffectHelper(this)
     }
 
     var visualEffect: VisualEffect?
@@ -36,18 +32,21 @@ open class ChildrenVisualEffectFrameLayout @JvmOverloads constructor(
         }
     val isRendering get() = visualEffectHelper.isRendering
 
-    @SuppressLint("MissingSuperCall")
     override fun draw(canvas: Canvas) {
-        visualEffectHelper.draw(canvas)
+        visualEffectHelper.draw(canvas) {
+            super.draw(it)
+        }
     }
 
-    @SuppressLint("MissingSuperCall")
     override fun onRestoreInstanceState(state: Parcelable?) {
-        visualEffectHelper.onRestoreInstanceState(state)
+        visualEffectHelper.onRestoreInstanceState(state) {
+            super.onRestoreInstanceState(it)
+        }
     }
 
-    @SuppressLint("MissingSuperCall")
     override fun onSaveInstanceState(): Parcelable {
-        return visualEffectHelper.onSaveInstanceState()
+        return visualEffectHelper.onSaveInstanceState {
+            super.onSaveInstanceState()
+        }
     }
 }
