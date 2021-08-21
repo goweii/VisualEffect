@@ -13,19 +13,15 @@ import java.text.NumberFormat
 import kotlin.math.max
 
 class BackdropVisualEffectHelper(private val view: View) {
-    private val bitmapCanvas = Canvas()
+    private var bitmapCanvas: Canvas? = null
     private var cacheBitmap: Bitmap? = null
     private var activityDecorView: View? = null
     private var isDifferentRoot = false
 
+    private val renderingListener = RenderingListener()
+    private val locations = IntArray(2)
     private val srcRect = Rect()
     private val dstRect = Rect()
-
-    private val locations = IntArray(2)
-    private val onPreDrawListener = ViewTreeObserver.OnPreDrawListener {
-        renderOnce()
-        true
-    }
 
     private val paint = Paint().apply {
         isAntiAlias = true
@@ -108,6 +104,7 @@ class BackdropVisualEffectHelper(private val view: View) {
         cacheBitmap?.let {
             onDrawEffectedBitmap(canvas, it)
         }
+        canvas.drawColor(overlayColor)
         if (isShowDebugInfo) {
             onDrawDebugInfo(canvas)
         }
@@ -140,10 +137,8 @@ class BackdropVisualEffectHelper(private val view: View) {
         view.context.getActivity()?.let {
             activityDecorView = it.window?.decorView
         }
+        registerRenderingListener()
         activityDecorView?.let {
-            if (it.viewTreeObserver.isAlive) {
-                it.viewTreeObserver.addOnPreDrawListener(onPreDrawListener)
-            }
             isDifferentRoot = it.rootView !== view.rootView
             if (isDifferentRoot) {
                 it.postInvalidate()
@@ -154,25 +149,51 @@ class BackdropVisualEffectHelper(private val view: View) {
     }
 
     private fun onDetachedFromWindow() {
+        unregisterRenderingListener()
+        visualEffect?.recycle()
+    }
+
+    private fun registerRenderingListener() {
         activityDecorView?.let {
             if (it.viewTreeObserver.isAlive) {
-                it.viewTreeObserver.removeOnPreDrawListener(onPreDrawListener)
+                it.viewTreeObserver.addOnPreDrawListener(renderingListener)
+            }
+            isDifferentRoot = it.rootView !== view.rootView
+            if (isDifferentRoot) {
+                it.postInvalidate()
             }
         }
-        visualEffect?.recycle()
+    }
+
+    private fun unregisterRenderingListener() {
+        activityDecorView?.let {
+            if (it.viewTreeObserver.isAlive) {
+                it.viewTreeObserver.removeOnPreDrawListener(renderingListener)
+            }
+        }
     }
 
     private fun prepare() {
         val simpledWidth = (view.width / simpleSize).toInt()
         val simpledHeight = (view.height / simpleSize).toInt()
-        if (cacheBitmap == null || cacheBitmap!!.width != simpledWidth || cacheBitmap!!.height != simpledHeight) {
+        if (simpledWidth <= 0 || simpledHeight <= 0) {
+            bitmapCanvas = null
+            cacheBitmap = null
+        } else if (cacheBitmap == null || cacheBitmap!!.width != simpledWidth || cacheBitmap!!.height != simpledHeight) {
             cacheBitmap = try {
                 Bitmap.createBitmap(simpledWidth, simpledHeight, Bitmap.Config.ARGB_8888)
             } catch (e: OutOfMemoryError) {
                 Runtime.getRuntime().gc()
                 null
             }
-            bitmapCanvas.setBitmap(cacheBitmap)
+            if (cacheBitmap != null) {
+                if (bitmapCanvas == null) {
+                    bitmapCanvas = Canvas()
+                }
+                bitmapCanvas!!.setBitmap(cacheBitmap)
+            } else {
+                bitmapCanvas = null
+            }
         }
     }
 
@@ -182,8 +203,8 @@ class BackdropVisualEffectHelper(private val view: View) {
         val decor = activityDecorView ?: return
         if (!decor.isDirty) return
         prepare()
+        val canvas = bitmapCanvas ?: return
         val bitmap = cacheBitmap ?: return
-        val canvas = bitmapCanvas
         renderStartTime = System.nanoTime()
         bitmap.eraseColor(Color.TRANSPARENT)
         captureToBitmap(decor, canvas, bitmap)
@@ -224,7 +245,6 @@ class BackdropVisualEffectHelper(private val view: View) {
         dstRect.right = view.width
         dstRect.bottom = view.height
         canvas.drawBitmap(bitmap, srcRect, dstRect, paint)
-        canvas.drawColor(overlayColor)
     }
 
     private fun onDrawDebugInfo(canvas: Canvas) {
@@ -270,6 +290,13 @@ class BackdropVisualEffectHelper(private val view: View) {
             dest.writeFloat(simpleSize)
             dest.writeInt(overlayColor)
             dest.writeParcelable(visualEffect, 0)
+        }
+    }
+
+    private inner class RenderingListener : ViewTreeObserver.OnPreDrawListener {
+        override fun onPreDraw(): Boolean {
+            renderOnce()
+            return true
         }
     }
 

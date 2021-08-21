@@ -11,8 +11,8 @@ import java.text.NumberFormat
 import kotlin.math.max
 
 class ChildrenVisualEffectHelper(private val view: View) {
+    private var bitmapCanvas: Canvas? = null
     private var cacheBitmap: Bitmap? = null
-    private val bitmapCanvas = Canvas()
     private val paint = Paint().apply {
         isAntiAlias = true
         typeface = Typeface.MONOSPACE
@@ -72,6 +72,7 @@ class ChildrenVisualEffectHelper(private val view: View) {
             return
         }
         prepare()
+        val bitmapCanvas = bitmapCanvas ?: return
         val cacheBitmap = cacheBitmap ?: return
         renderStartTime = System.nanoTime()
         val restoreCount = bitmapCanvas.save()
@@ -114,14 +115,24 @@ class ChildrenVisualEffectHelper(private val view: View) {
     private fun prepare() {
         val simpledWidth = (view.width / simpleSize).toInt()
         val simpledHeight = (view.height / simpleSize).toInt()
-        if (cacheBitmap == null || cacheBitmap!!.width != simpledWidth || cacheBitmap!!.height != simpledHeight) {
+        if (simpledWidth <= 0 || simpledHeight <= 0) {
+            bitmapCanvas = null
+            cacheBitmap = null
+        } else if (cacheBitmap == null || cacheBitmap!!.width != simpledWidth || cacheBitmap!!.height != simpledHeight) {
             cacheBitmap = try {
                 Bitmap.createBitmap(simpledWidth, simpledHeight, Bitmap.Config.ARGB_8888)
             } catch (e: OutOfMemoryError) {
                 Runtime.getRuntime().gc()
                 null
             }
-            bitmapCanvas.setBitmap(cacheBitmap)
+            if (cacheBitmap != null) {
+                if (bitmapCanvas == null) {
+                    bitmapCanvas = Canvas()
+                }
+                bitmapCanvas!!.setBitmap(cacheBitmap)
+            } else {
+                bitmapCanvas = null
+            }
         }
     }
 
