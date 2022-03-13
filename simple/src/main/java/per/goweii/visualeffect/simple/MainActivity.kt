@@ -1,4 +1,4 @@
-package per.goweii.android.visualeffect
+package per.goweii.visualeffect.simple
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
-import per.goweii.android.visualeffect.databinding.ActivityMainBinding
+import per.goweii.visualeffect.simple.databinding.ActivityMainBinding
 import per.goweii.visualeffect.blur.BlurEffect
 import per.goweii.visualeffect.blur.FastBlurEffect
 import per.goweii.visualeffect.blur.RSBlurEffect

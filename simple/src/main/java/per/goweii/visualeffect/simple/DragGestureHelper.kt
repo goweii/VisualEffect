@@ -1,4 +1,4 @@
-package per.goweii.android.visualeffect
+package per.goweii.visualeffect.simple
 
 import android.annotation.SuppressLint
 import android.view.GestureDetector

@@ -7,14 +7,14 @@ buildscript {
 
     ext.android_compile_sdk_version = 30
     ext.android_build_tools_version = "30.0.3"
-    ext.android_min_sdk_version = 14
+    ext.android_min_sdk_version = 17
     ext.android_target_sdk_version = 30
     ext.android_version_code = 1
     ext.android_version_name = "1.0"
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
@@ -25,7 +25,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url "https://www.jitpack.io" }
     }
 }

@@ -6,7 +6,7 @@ apply from: "../lib-build.gradle"
 
 android {
     defaultConfig {
-        applicationId "per.goweii.android.visualeffect"
+        applicationId "per.goweii.visualeffect.simple"
     }
 
     buildFeatures {

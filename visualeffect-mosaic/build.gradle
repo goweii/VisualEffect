@@ -5,5 +5,5 @@ plugins {
 apply from: "../lib-build.gradle"
 
 dependencies {
-    compileOnly project(":visualeffect-core")
+    api project(":visualeffect-core")
 }

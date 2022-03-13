@@ -6,7 +6,7 @@ Used to achieve visual effects in Android, such as Gaussian blur, mosaic, waterm
 
 |  |  |  |  |
 | ---- | ---- | ---- | ---- |
-| ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/app/preview/20220312_125541.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/app/preview/20220312_125614.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/app/preview/20220312_125630.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/app/preview/20220312_125700.gif) |
+| ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/simple/preview/20220312_125541.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/simple/preview/20220312_125614.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/simple/preview/20220312_125630.gif) | ![](https://raw.githubusercontent.com/goweii/VisualEffect/master/simple/preview/20220312_125700.gif) |
 
 # How to Use
 

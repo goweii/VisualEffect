@@ -1,5 +1,3 @@
-apply from: "../maven-upload.gradle"
-
 android {
     compileSdkVersion android_compile_sdk_version
     buildToolsVersion android_build_tools_version

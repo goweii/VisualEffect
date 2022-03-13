@@ -1,7 +1,7 @@
+rootProject.name = "VisualEffect"
+include ':simple'
+include ':visualeffect-core'
+include ':visualeffect-blur'
 include ':visualeffect-mosaic'
 include ':visualeffect-watermask'
-include ':visualeffect-blur'
 include ':visualeffect-view'
-include ':visualeffect-core'
-include ':app'
-rootProject.name = "VisualEffect"

@@ -1,4 +1,4 @@
-package per.goweii.android.visualeffect
+package per.goweii.visualeffect.simple
 
 inline fun timeCost(block: () -> Unit) : Long {
     val start = System.currentTimeMillis()
