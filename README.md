@@ -1,5 +1,7 @@
 # VisualEffect
 
+[![Android CI](https://github.com/goweii/VisualEffect/actions/workflows/android.yml/badge.svg?branch=master)](https://github.com/goweii/VisualEffect/actions/workflows/android.yml)
+
 Used to achieve visual effects in Android, such as Gaussian blur, mosaic, watermark, etc.
 
 # Preview
